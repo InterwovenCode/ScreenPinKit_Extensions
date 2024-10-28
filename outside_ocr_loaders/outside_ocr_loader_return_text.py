@@ -56,7 +56,7 @@ class OutsideOcrLoader_ReturnText(OcrLoaderInterface):
         ocrResultPath = f"{imagePath}.json"
         if not os.path.exists(ocrResultPath):
             ocrRunnerBatPath = os.path.join(workDir, "deps/try_paddle_ocr_runner.bat") 
-            # ocrRunnerBatPath = os.path.join(workDir, "deps/try_tessact_ocr_runner.bat") 
+            # ocrRunnerBatPath = os.path.join(workDir, "deps/try_tesseract_ocr_runner.bat") 
             fullCmd = f"{ocrRunnerBatPath} {imagePath} {ocrResultPath}"
             OsHelper.executeSystemCommand(fullCmd)
 

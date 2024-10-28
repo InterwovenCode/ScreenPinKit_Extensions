@@ -12,5 +12,5 @@ class GlobalHotkeyViewerPlugin(PluginInterface):
     def handleEvent(self, eventName: GlobalEventEnum, *args, **kwargs):
         if eventName == GlobalEventEnum.GlobalHotKeyRegisterEnd:
             keyboard:KeyboardEx = kwargs["keyboard"]
-            self.log(f"已注册快捷键：{keyboard.map_callbacks.keys()}")
+            self.log(f"已注册快捷键：{keyboard.hotkeyBinds.keys()}")
         pass

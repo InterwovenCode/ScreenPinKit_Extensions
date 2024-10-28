@@ -1,5 +1,5 @@
 # ScreenPinKit 扩展
-本仓库主要包含了一些ScreenPinKit相关的外部OCR加载器的扩展，以及一些辅助工具和插件
+本仓库主要包含了一些[ScreenPinKit](https://github.com/YaoXuanZhi/ScreenPinKit)相关的外部OCR加载器的扩展，以及一些辅助工具和插件
 
 ## 目录结构
 ### outside_ocr_loaders
