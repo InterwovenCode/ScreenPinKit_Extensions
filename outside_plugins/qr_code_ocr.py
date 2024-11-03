@@ -1,0 +1,86 @@
+from plugin import *
+from qfluentwidgets import (InfoBar, InfoBarPosition, Action)
+from cv2.wechat_qrcode import WeChatQRCode
+import os
+
+class QrCodeOCR(PluginInterface):
+    def __init__(self):
+        super().__init__()
+        self._runtimePath = os.path.dirname(os.path.abspath(__file__))
+    
+    @property
+    def runtimePath(self):
+        return self._runtimePath
+
+    @property
+    def name(self):
+        return "QrCodeOCR"
+
+    @property
+    def desc(self):
+        return "识别图片上的二维码"
+
+    def extractWatermarkText(self, sourcePixmap:QPixmap, outputPath:str = None) -> str:
+        '''提取二维码上的文本'''
+        image:Image = Image.fromqpixmap(sourcePixmap).convert("RGB")
+        width = image.size[0]
+        height = image.size[1]
+        watermarkSize = (width, height)
+        watermark = Image.new("L", watermarkSize)
+
+        imagePixels = image.load()
+        watermarkPixels = watermark.load()
+
+        for i in range(watermarkSize[0]):
+            for j in range(watermarkSize[1]):
+                r, g, b = imagePixels[i, j]
+
+                # 从图像的RGB通道中提取水印的最低有效位
+                w = ((r & 0x01) << 7) | ((g & 0x01) << 6) | ((b & 0x01) << 5)
+                watermarkPixels[i, j] = w
+
+        # 保存提取的水印
+        if not outputPath == None:
+            watermark.save(outputPath)
+
+        if not hasattr(self, "detector"):
+            self.detector = WeChatQRCode(
+                f"{self.runtimePath}/model/detect.prototxt", 
+                f"{self.runtimePath}/model/detect.caffemodel",
+                f"{self.runtimePath}/model/sr.prototxt",
+                f"{self.runtimePath}/model/sr.caffemodel")
+
+        res, _points = self.detector.detectAndDecode(np.array(watermark))
+        return "\n".join(res)
+
+    def handleEvent(self, eventName, *args, **kwargs):
+        if eventName == GlobalEventEnum.RegisterContextMenuEvent:
+        # if eventName == GlobalEventEnum.RegisterToolbarMenuEvent:
+            actions:list = kwargs["actions"]
+            pixmap:QPixmap = kwargs["pixmap"]
+            parentWidget:QWidget = kwargs["parent"]
+            actions.append(Action(ScreenShotIcon.CLICK_THROUGH, "二维码识别", triggered=lambda: self.tryQrCodeOcr(parentWidget, pixmap)))
+            pass
+
+    def tryQrCodeOcr(self, parentWidget:QWidget, pixmap:QPixmap):
+        text = self.extractWatermarkText(pixmap)
+        if len(text) == 0:
+            InfoBar.info(
+                title='没有检测到二维码',
+                content="",
+                orient=Qt.Horizontal,
+                isClosable=False,
+                position=InfoBarPosition.BOTTOM_RIGHT,
+                duration=2000,    # won't disappear automatically
+                parent=parentWidget,
+            )
+        else:
+            InfoBar.success(
+                title='二维码识别成功',
+                content=text,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.BOTTOM_RIGHT,
+                duration=-1,    # won't disappear automatically
+                parent=parentWidget,
+            )
