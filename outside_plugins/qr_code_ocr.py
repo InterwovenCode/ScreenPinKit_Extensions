@@ -1,5 +1,5 @@
 from plugin import *
-from qfluentwidgets import (InfoBar, InfoBarPosition, Action)
+from qfluentwidgets import (InfoBar, InfoBarIcon, InfoBarPosition, Action, FluentIcon as FIF, TransparentToolButton)
 from cv2.wechat_qrcode import WeChatQRCode
 import os
 
@@ -23,6 +23,18 @@ class QrCodeOCR(PluginInterface):
     def extractWatermarkText(self, sourcePixmap:QPixmap, outputPath:str = None) -> str:
         '''提取二维码上的文本'''
         image:Image = Image.fromqpixmap(sourcePixmap).convert("RGB")
+
+        if not hasattr(self, "detector"):
+            self.detector = WeChatQRCode(
+                f"{self.runtimePath}/model/detect.prototxt", 
+                f"{self.runtimePath}/model/detect.caffemodel",
+                f"{self.runtimePath}/model/sr.prototxt",
+                f"{self.runtimePath}/model/sr.caffemodel")
+
+        res, _points = self.detector.detectAndDecode(np.array(image))
+        if len(res) > 0:
+            return "\n".join(res)
+
         width = image.size[0]
         height = image.size[1]
         watermarkSize = (width, height)
@@ -42,13 +54,6 @@ class QrCodeOCR(PluginInterface):
         # 保存提取的水印
         if not outputPath == None:
             watermark.save(outputPath)
-
-        if not hasattr(self, "detector"):
-            self.detector = WeChatQRCode(
-                f"{self.runtimePath}/model/detect.prototxt", 
-                f"{self.runtimePath}/model/detect.caffemodel",
-                f"{self.runtimePath}/model/sr.prototxt",
-                f"{self.runtimePath}/model/sr.caffemodel")
 
         res, _points = self.detector.detectAndDecode(np.array(watermark))
         return "\n".join(res)
@@ -75,12 +80,17 @@ class QrCodeOCR(PluginInterface):
                 parent=parentWidget,
             )
         else:
-            InfoBar.success(
-                title='二维码识别成功',
-                content=text,
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.BOTTOM_RIGHT,
-                duration=-1,    # won't disappear automatically
-                parent=parentWidget,
-            )
+            infoBar = InfoBar(InfoBarIcon.SUCCESS, "二维码识别成功", text, Qt.Horizontal,
+                        True, -1, InfoBarPosition.BOTTOM_RIGHT, parentWidget)
+            copyButton = TransparentToolButton(FIF.COPY, parentWidget)
+            copyButton.setFixedSize(36, 36)
+            copyButton.setIconSize(QSize(12, 12))
+            copyButton.setCursor(Qt.PointingHandCursor)
+            copyButton.setVisible(True)
+            copyButton.clicked.connect(lambda: self.copyText(infoBar))
+            infoBar.addWidget(copyButton)
+            infoBar.show()
+
+    def copyText(self, infoBar:InfoBar):
+        text = infoBar.contentLabel.text()
+        QApplication.clipboard().setText(text)
