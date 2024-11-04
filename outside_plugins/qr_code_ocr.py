@@ -80,8 +80,17 @@ class QrCodeOCR(PluginInterface):
                 parent=parentWidget,
             )
         else:
-            infoBar = InfoBar(InfoBarIcon.SUCCESS, "二维码识别成功", text, Qt.Horizontal,
-                        True, -1, InfoBarPosition.BOTTOM_RIGHT, parentWidget)
+            infoBar = InfoBar(
+                icon=InfoBarIcon.SUCCESS,
+                title='二维码识别成功',
+                content=text,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.BOTTOM_RIGHT,
+                duration=-1,    # won't disappear automatically
+                parent=parentWidget,
+            )
+
             copyButton = TransparentToolButton(FIF.COPY, parentWidget)
             copyButton.setFixedSize(36, 36)
             copyButton.setIconSize(QSize(12, 12))
