@@ -22,7 +22,9 @@ class QrCodeOCR(PluginInterface):
 
     def extractWatermarkText(self, sourcePixmap:QPixmap, outputPath:str = None) -> str:
         '''提取二维码上的文本'''
-        image:Image = Image.fromqpixmap(sourcePixmap).convert("RGB")
+        image:Image = Image.fromqpixmap(sourcePixmap)
+        if image.mode != "RGBA":
+            image = image.convert("RGB")
 
         if not hasattr(self, "detector"):
             self.detector = WeChatQRCode(
@@ -45,7 +47,10 @@ class QrCodeOCR(PluginInterface):
 
         for i in range(watermarkSize[0]):
             for j in range(watermarkSize[1]):
-                r, g, b = imagePixels[i, j]
+                if image.mode == "RGBA":
+                    r, g, b, a = imagePixels[i, j]
+                else:
+                    r, g, b = imagePixels[i, j]
 
                 # 从图像的RGB通道中提取水印的最低有效位
                 w = ((r & 0x01) << 7) | ((g & 0x01) << 6) | ((b & 0x01) << 5)

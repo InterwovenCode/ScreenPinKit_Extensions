@@ -20,6 +20,8 @@ class CombineWaterMarke(PluginInterface):
         return "添加水印到图像上"
 
     def __embedLsbWatermark(self, sourceImage:Image, watermarkImage:Image, outputPath:str = None) -> QPixmap:
+        if sourceImage.mode != "RGBA":
+            sourceImage = sourceImage.convert("RGB")
         # 获取图像和水印的像素数据
         imagePixels = sourceImage.load()
         watermarkPixels = watermarkImage.load()
@@ -31,15 +33,28 @@ class CombineWaterMarke(PluginInterface):
         # 嵌入水印
         for i in range(watermarkImage.size[0]):
             for j in range(watermarkImage.size[1]):
-                r, g, b = imagePixels[i, j]
-                w = watermarkPixels[i, j]
 
-                # 将水印的最低有效位嵌入到图像的RGB通道中
-                r = (r & 0xFE) | ((w >> 7) & 0x01)
-                g = (g & 0xFE) | ((w >> 6) & 0x01)
-                b = (b & 0xFE) | ((w >> 5) & 0x01)
+                if sourceImage.mode == "RGBA":
+                    r, g, b, a = imagePixels[i, j]
+                    w = watermarkPixels[i, j]
 
-                imagePixels[i, j] = (r, g, b)
+                    # 将水印的最低有效位嵌入到图像的RGB通道中
+                    r = (r & 0xFE) | ((w >> 7) & 0x01)
+                    g = (g & 0xFE) | ((w >> 6) & 0x01)
+                    b = (b & 0xFE) | ((w >> 5) & 0x01)
+                    # a = (b & 0xFE) | ((w >> 4) & 0x01)
+
+                    imagePixels[i, j] = (r, g, b, a)
+                else:
+                    r, g, b = imagePixels[i, j]
+                    w = watermarkPixels[i, j]
+
+                    # 将水印的最低有效位嵌入到图像的RGB通道中
+                    r = (r & 0xFE) | ((w >> 7) & 0x01)
+                    g = (g & 0xFE) | ((w >> 6) & 0x01)
+                    b = (b & 0xFE) | ((w >> 5) & 0x01)
+
+                    imagePixels[i, j] = (r, g, b)
 
         # 保存嵌入水印后的图像
         if outputPath != None:
@@ -47,7 +62,12 @@ class CombineWaterMarke(PluginInterface):
 
         width = sourceImage.size[0]
         height = sourceImage.size[1]
-        return QPixmap.fromImage(QImage(sourceImage.tobytes(), width, height, 3*width, QImage.Format.Format_RGB888))
+
+        if sourceImage.mode == "RGBA":
+            return QPixmap.fromImage(QImage(sourceImage.tobytes(), width, height, 4*width, QImage.Format.Format_RGBA8888))
+        else:
+            return QPixmap.fromImage(QImage(sourceImage.tobytes(), width, height, 3*width, QImage.Format.Format_RGB888))
+
 
     def embedWatermarkImage(self, sourcePixmap:QPixmap, watermarkPath:str, outputPath:str = None) -> QPixmap:
         '''添加图片水印'''
@@ -58,7 +78,7 @@ class CombineWaterMarke(PluginInterface):
 
     def embedWatermarkText(self, sourcePixmap:QPixmap, text:str, outputPath:str = None) -> QPixmap:
         '''添加文本水印，先转换为二维码再插入到图片中'''
-        image:Image = Image.fromqpixmap(sourcePixmap).convert("RGB")
+        image:Image = Image.fromqpixmap(sourcePixmap)
         watermark = self.textToQrCode(text).convert("L")
         return self.__embedLsbWatermark(image, watermark, outputPath)
 
