@@ -69,7 +69,7 @@ class QrCodeOCR(PluginInterface):
             actions:list = kwargs["actions"]
             pixmap:QPixmap = kwargs["pixmap"]
             parentWidget:QWidget = kwargs["parent"]
-            actions.append(Action(ScreenShotIcon.CLICK_THROUGH, "二维码识别", triggered=lambda: self.tryQrCodeOcr(parentWidget, pixmap)))
+            actions.append(Action(ScreenShotIcon.QR_CODE, "二维码识别", triggered=lambda: self.tryQrCodeOcr(parentWidget, pixmap)))
             pass
 
     def tryQrCodeOcr(self, parentWidget:QWidget, pixmap:QPixmap):
