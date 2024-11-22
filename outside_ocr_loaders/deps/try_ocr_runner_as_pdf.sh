@@ -1,0 +1,1 @@
+ocrmypdf -l chi_sim --skip-text --jobs 4 --output-type pdfa $1 $2

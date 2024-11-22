@@ -40,8 +40,15 @@ class OutsideOcrLoaderAsPdf_ReturnFileName(OcrLoaderInterface):
 
         使用OCRmyPDF实现，其内部使用img2pdf会将图片转换为pdf再进行OCR识别
         '''
-        ocrRunnerBatPath = os.path.join(workDir, "deps/try_ocr_runner_as_pdf.bat") 
-        fullCmd = f"{ocrRunnerBatPath} {input} {output}"
+        import platform
+        system = platform.system()
+        if system == "Windows":
+            ocrRunnerBatPath = os.path.join(workDir, "deps/try_ocr_runner_as_pdf.bat") 
+            fullCmd = f"{ocrRunnerBatPath} {input} {output}"
+        else:
+            ocrRunnerBatPath = os.path.join(workDir, "deps/try_ocr_runner_as_pdf.sh") 
+            fullCmd = f"sh {ocrRunnerBatPath} {input} {output}"
+
         OsHelper.executeSystemCommand(fullCmd)
 
     def ocr(self, pixmap:QPixmap):
@@ -69,4 +76,5 @@ class OutsideOcrLoaderAsPdf_ReturnFileName(OcrLoaderInterface):
                 self.image2OcrPdfWithTextLayer(workDir, imagePath, pdfPath)
             return pdfPath
         except Exception as e:
-            raise Exception("请检查ocrmypdf的相关运行环境是否配置好了")
+            errorMsg = "\n".join(e.args)
+            raise Exception(f"请检查ocrmypdf的相关运行环境是否配置好了 {errorMsg}")
