@@ -16,8 +16,28 @@ class CombineWaterMarke(PluginInterface):
         return "CombineWaterMarke"
 
     @property
+    def displayName(self):
+        return "嵌入水印"
+
+    @property
     def desc(self):
-        return "添加水印到图像上"
+        return "该插件会在复制&保存图片的时候嵌入一个二维码水印到图像内，可以借此防止被盗用。"
+
+    @property
+    def author(self) -> str:
+        return "yaoxuanzhi"
+
+    @property
+    def icon(self):
+        return QIcon(self.runtimePath + "/icons/water_marke.svg")
+
+    @property
+    def version(self) -> str:
+        return "v1.0.0"
+
+    @property
+    def url(self) -> str:
+        return "https://github.com/InterwovenCode/ScreenPinKit_Extensions/blob/main/outside_plugins/combine_water_marke.py"
 
     def __embedLsbWatermark(self, sourceImage:Image, watermarkImage:Image, outputPath:str = None) -> QPixmap:
         if sourceImage.mode != "RGBA":

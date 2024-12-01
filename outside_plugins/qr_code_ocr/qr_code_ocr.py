@@ -17,8 +17,24 @@ class QrCodeOCR(PluginInterface):
         return "QrCodeOCR"
 
     @property
+    def displayName(self):
+        return "二维码识别"
+
+    @property
     def desc(self):
-        return "识别图片上的二维码"
+        return "右键菜单提供二维码识别菜单项，可以识别隐藏的二维码水印"
+
+    @property
+    def icon(self):
+        return QIcon(self.runtimePath + "/icons/qr_code.svg")
+
+    @property
+    def version(self):
+        return "1.0.0"
+
+    @property
+    def author(self):
+        return "yaoxuanzhi"
 
     def extractWatermarkText(self, sourcePixmap:QPixmap, outputPath:str = None) -> str:
         '''提取二维码上的文本'''
@@ -69,8 +85,7 @@ class QrCodeOCR(PluginInterface):
             actions:list = kwargs["actions"]
             pixmap:QPixmap = kwargs["pixmap"]
             parentWidget:QWidget = kwargs["parent"]
-            actions.append(Action(ScreenShotIcon.QR_CODE, "二维码识别", triggered=lambda: self.tryQrCodeOcr(parentWidget, pixmap)))
-            pass
+            actions.append(Action(self.icon, "二维码识别", triggered=lambda: self.tryQrCodeOcr(parentWidget, pixmap)))
 
     def tryQrCodeOcr(self, parentWidget:QWidget, pixmap:QPixmap):
         text = self.extractWatermarkText(pixmap)
