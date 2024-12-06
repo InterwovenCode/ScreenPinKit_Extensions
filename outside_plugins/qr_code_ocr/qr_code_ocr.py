@@ -33,6 +33,14 @@ class QrCodeOCR(PluginInterface):
         return "1.0.0"
 
     @property
+    def url(self) -> str:
+        return "https://github.com/InterwovenCode/ScreenPinKit_Extensions/blob/main/outside_plugins/qr_code_ocr.py"
+
+    @property
+    def tags(self) -> list:
+        return ["二维码", "ocr"]
+
+    @property
     def author(self):
         return "yaoxuanzhi"
 

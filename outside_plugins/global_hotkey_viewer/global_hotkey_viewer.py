@@ -37,6 +37,10 @@ class GlobalHotkeyViewerPlugin(PluginInterface):
     def url(self) -> str:
         return "https://github.com/InterwovenCode/ScreenPinKit_Extensions/blob/main/outside_plugins/global_hotkey_viewer.py"
 
+    @property
+    def tags(self) -> list:
+        return ["热键", "日志"]
+
     def handleEvent(self, eventName: GlobalEventEnum, *args, **kwargs):
         if eventName == GlobalEventEnum.GlobalHotKeyRegisterEnd:
             keyboard:KeyboardEx = kwargs["keyboard"]

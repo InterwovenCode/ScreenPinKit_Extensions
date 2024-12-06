@@ -35,8 +35,16 @@ class SetPdfOcrEnv(PluginInterface):
     def url(self) -> str:
         return "http://interwovencode.xyz/"
 
-    def onLoaded(self):
-        os.environ["venv_path"] = "D:/ProgramData/Miniconda3/envs/ocrmypdf_env/"
-        os.environ["tesseract_path"] = "D:/GreenSoftware/Tesseract-OCR"
-        # print("修改Pdf-Ocr环境变量成功")
-        pass
+    @property
+    def tags(self) -> list:
+        return ["环境变量"]
+
+    def onChangeEnabled(self):
+        if self.enable:
+            os.environ["venv_path"] = "D:/ProgramData/Miniconda3/envs/ocrmypdf_env/"
+            os.environ["tesseract_path"] = "D:/GreenSoftware/Tesseract-OCR"
+            self.log("修改Pdf-Ocr环境变量成功")
+        else:
+            os.environ.pop("venv_path")
+            os.environ.pop("tesseract_path")
+            self.log("取消Pdf-Ocr环境变量设置")

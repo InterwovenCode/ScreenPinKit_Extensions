@@ -39,6 +39,10 @@ class CombineWaterMarke(PluginInterface):
     def url(self) -> str:
         return "https://github.com/InterwovenCode/ScreenPinKit_Extensions/blob/main/outside_plugins/combine_water_marke.py"
 
+    @property
+    def tags(self) -> list:
+        return ["水印"]
+
     def __embedLsbWatermark(self, sourceImage:Image, watermarkImage:Image, outputPath:str = None) -> QPixmap:
         if sourceImage.mode != "RGBA":
             sourceImage = sourceImage.convert("RGB")

@@ -37,5 +37,13 @@ class PluginTemplate(PluginInterface):
     def url(self) -> str:
         return "http://interwovencode.xyz/"
 
+    @property
+    def tags(self) -> list:
+        return ["参考", "模板", "辅助开发"]
+
+    def onChangeEnabled(self):
+        self.log(f"onChangeEnabled ===> {self.name} ===> {self.enable} ")
+
     def handleEvent(self, eventName, *args, **kwargs):
+        self.log(f"handleEvent {eventName} ===> {args} ==> {kwargs}")
         return super().handleEvent(eventName, *args, **kwargs)
