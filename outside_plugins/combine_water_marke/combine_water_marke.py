@@ -37,7 +37,7 @@ class CombineWaterMarke(PluginInterface):
 
     @property
     def url(self) -> str:
-        return "https://github.com/InterwovenCode/ScreenPinKit_Extensions/blob/main/outside_plugins/combine_water_marke.py"
+        return "https://github.com/InterwovenCode/ScreenPinKit_Extensions"
 
     @property
     def tags(self) -> list:
